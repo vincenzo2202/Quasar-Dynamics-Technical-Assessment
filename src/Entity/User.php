@@ -21,8 +21,11 @@ class User
     #[ORM\Column(length: 50)]
     private ?string $username = null;
 
+    #[ORM\Column(type: "string", length: 100, unique: true)]
+    private ?string $email = null ;
+
     #[ORM\Column(length: 100)]
-    private ?string $email = null;
+    private ?string $password = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     private ?\DateTimeInterface $created_at = null;
@@ -55,6 +58,18 @@ class User
     public function setEmail(string $email): static
     {
         $this->email = $email;
+
+        return $this;
+    }
+
+    public function getPassword(): ?string
+    {
+        return $this->password;
+    }
+
+    public function setPassword(string $password): static
+    {
+        $this->password = $password;
 
         return $this;
     }
