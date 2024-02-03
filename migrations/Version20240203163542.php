@@ -7,9 +7,7 @@ namespace DoctrineMigrations;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\Migrations\AbstractMigration;
 
-/**
- * Auto-generated Migration: Please modify to your needs!
- */
+ 
 final class Version20240203163542 extends AbstractMigration
 {
     public function getDescription(): string
@@ -19,7 +17,6 @@ final class Version20240203163542 extends AbstractMigration
 
     public function up(Schema $schema): void
     {
-        // this up() migration is auto-generated, please modify it to your needs
         $this->addSql('CREATE TABLE notes (
             id INT AUTO_INCREMENT NOT NULL, 
             user_id INT NOT NULL, 
@@ -36,10 +33,8 @@ final class Version20240203163542 extends AbstractMigration
 
     public function down(Schema $schema): void
     {
-        // this down() migration is auto-generated, please modify it to your needs
         $this->addSql('ALTER TABLE notes DROP FOREIGN KEY FK_11BA68CA76ED395');
         $this->addSql('DROP TABLE notes');
         $this->addSql('ALTER TABLE user MODIFY created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP, MODIFY updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP');
-    
     }
 }
