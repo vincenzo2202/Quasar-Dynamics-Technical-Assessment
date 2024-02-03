@@ -14,7 +14,7 @@ final class Version20240203163542 extends AbstractMigration
 {
     public function getDescription(): string
     {
-        return '';
+        return 'Create notes table with fields id, user_id,title,note, created_at, and updated_at';
     }
 
     public function up(Schema $schema): void
