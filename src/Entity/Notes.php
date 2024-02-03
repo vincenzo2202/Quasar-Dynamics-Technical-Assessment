@@ -5,8 +5,10 @@ namespace App\Entity;
 use App\Repository\NotesRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\ORM\Mapping\HasLifecycleCallbacks;
 
 #[ORM\Entity(repositoryClass: NotesRepository::class)]
+#[HasLifecycleCallbacks]
 class Notes
 {
     #[ORM\Id]
@@ -20,8 +22,9 @@ class Notes
     #[ORM\Column(length: 255)]
     private ?string $note = null;
 
-    #[ORM\Column]
-    private ?int $user_id = null;
+    #[ORM\ManyToOne]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?User $user = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     private ?\DateTimeInterface $created_at = null;
@@ -58,14 +61,14 @@ class Notes
         return $this;
     }
 
-    public function getUserId(): ?int
+    public function getUserId(): ?User
     {
-        return $this->user_id;
+        return $this->user;
     }
 
-    public function setUserId(int $user_id): static
+    public function setUserId(?User $user_id): static
     {
-        $this->user_id = $user_id;
+        $this->user = $user_id;
 
         return $this;
     }
@@ -92,5 +95,22 @@ class Notes
         $this->updated_at = $updated_at;
 
         return $this;
+    }
+
+       /**
+     * @ORM\PrePersist
+     */
+    public function prePersist(): void
+    {
+        $this->created_at = $this->created_at ?? new \DateTime();
+        $this->updated_at = $this->updated_at ?? new \DateTime();
+    }
+
+    /**
+     * @ORM\PreUpdate
+     */
+    public function preUpdate(): void
+    {
+        $this->updated_at = new \DateTime();
     }
 }
