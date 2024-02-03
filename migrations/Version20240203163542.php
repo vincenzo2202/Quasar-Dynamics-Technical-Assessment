@@ -28,13 +28,13 @@ final class Version20240203163542 extends AbstractMigration
             PRIMARY KEY(id)
             ) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
         $this->addSql('ALTER TABLE notes ADD CONSTRAINT FK_11BA68CA76ED395 FOREIGN KEY (user_id) REFERENCES user (id)');
-        $this->addSql('ALTER TABLE user CHANGE created_at created_at DATETIME NOT NULL, CHANGE updated_at updated_at DATETIME NOT NULL');
+     
     }
 
     public function down(Schema $schema): void
     {
         $this->addSql('ALTER TABLE notes DROP FOREIGN KEY FK_11BA68CA76ED395');
         $this->addSql('DROP TABLE notes');
-        $this->addSql('ALTER TABLE user MODIFY created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP, MODIFY updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP');
+    
     }
 }

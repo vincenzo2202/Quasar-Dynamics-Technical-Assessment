@@ -12,7 +12,7 @@ final class Version20240203171413 extends AbstractMigration
 {
     public function getDescription(): string
     {
-        return 'Create category table with fields id, category, description, created_at, and updated_at';
+        return 'Create category table with fields id,category, description, created_at, and updated_at';
     }
 
     public function up(Schema $schema): void
@@ -25,12 +25,12 @@ final class Version20240203171413 extends AbstractMigration
             updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
             PRIMARY KEY(id)
                ) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
-        $this->addSql('ALTER TABLE notes CHANGE created_at created_at DATETIME NOT NULL, CHANGE updated_at updated_at DATETIME NOT NULL');
+    
     }
 
     public function down(Schema $schema): void
     {
         $this->addSql('DROP TABLE category');
-        $this->addSql('ALTER TABLE notes CHANGE created_at created_at DATETIME DEFAULT CURRENT_TIMESTAMP, CHANGE updated_at updated_at DATETIME DEFAULT CURRENT_TIMESTAMP');
+        
     }
 }
