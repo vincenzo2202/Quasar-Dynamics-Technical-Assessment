@@ -84,4 +84,49 @@ class CategoryNoteController extends AbstractController
         );
     }
    }
+
+    // Remove Category from Note
+    #[Route('/categoryNote/{id}', methods: ['DELETE'])]
+    public function removeCategoryNote(int $id): JsonResponse
+    {
+        try {
+            $data = $this->categoryNoteRepository->find($id);
+
+            if (!$data) {
+                return new JsonResponse(
+                    [
+                        "success" => true,
+                        "message" => "Category note not found"
+                    ],
+                    Response::HTTP_NOT_FOUND
+                );
+            }
+
+            $this->manager->remove($data);
+            $this->manager->flush();
+
+            return new JsonResponse(
+                [
+                    "success" => true,
+                    "message" => "Category removed from note",
+                    "data"=> [
+                        "id" => $id,
+                        "category" => $data->getCategory()->getCategory(),
+                        "note" => $data->getNote()->getId()
+                    ]
+                ],
+                Response::HTTP_OK
+            );
+        } catch (\Throwable $th) {
+            $this->logger->error($th->getMessage());
+
+            return new JsonResponse(
+                [
+                    "success" => false,
+                    "message" => "Error removing category from note"
+                ],
+                Response::HTTP_INTERNAL_SERVER_ERROR
+            );
+        }
+    }
 }
