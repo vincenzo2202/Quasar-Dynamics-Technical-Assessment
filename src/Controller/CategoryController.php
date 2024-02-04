@@ -223,7 +223,7 @@ class CategoryController extends AbstractController
         try {
             $data = json_decode($request->getContent(), true);
 
-            $category = $this->categoryRepository->find($id); 
+            $category = $this->categoryRepository->find($id);
 
             if (!$category) {
                 return new JsonResponse(
@@ -270,6 +270,46 @@ class CategoryController extends AbstractController
                 [
                     "success" => false,
                     "message" => "Error updating the category"
+                ],
+                Response::HTTP_INTERNAL_SERVER_ERROR
+            );
+        }
+    }
+
+    // Delete a category
+    #[Route('/category/{id}/delete', methods: ['DELETE'])]
+    public function deleteCategory(int $id): JsonResponse
+    {
+        try {
+            $category = $this->categoryRepository->find($id);
+
+            if (!$category) {
+                return new JsonResponse(
+                    [
+                        "success" => true,
+                        "message" => "Category not found"
+                    ],
+                    Response::HTTP_NOT_FOUND
+                );
+            }
+
+            $this->manager->remove($category);
+            $this->manager->flush();
+
+            return new JsonResponse(
+                [
+                    "success" => true,
+                    "message" => "Category deleted successfully"
+                ],
+                Response::HTTP_OK
+            );
+        } catch (\Throwable $th) {
+            $this->logger->error($th->getMessage());
+
+            return new JsonResponse(
+                [
+                    "success" => false,
+                    "message" => "Error deleting the category"
                 ],
                 Response::HTTP_INTERNAL_SERVER_ERROR
             );
