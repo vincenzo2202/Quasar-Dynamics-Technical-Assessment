@@ -265,7 +265,7 @@ class UserController extends AbstractController
                     'pattern' => '/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/',
                     'message' => 'The email is not valid'
                 ])
-            ] 
+            ]
         ]);
 
         $violations = $validator->validate($data, $validations);
@@ -286,7 +286,7 @@ class UserController extends AbstractController
     public function updateUser(int $id, Request $request): JsonResponse
     {
         try {
-            $data = json_decode($request->getContent(), true); 
+            $data = json_decode($request->getContent(), true);
 
             $user = $this->userRepository->find($id);
 
@@ -328,7 +328,7 @@ class UserController extends AbstractController
                         Response::HTTP_BAD_REQUEST
                     );
                 } else {
-                    $user->setEmail($data['email']); 
+                    $user->setEmail($data['email']);
                 }
             }
             $user->setUpdatedAt(new \DateTime());

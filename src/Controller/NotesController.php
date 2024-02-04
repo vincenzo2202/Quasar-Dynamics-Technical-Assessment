@@ -351,4 +351,44 @@ class NotesController extends AbstractController
             );
         }
     }
+
+    // Delete a note
+    #[Route('/note/{id}/delete', methods: ['DELETE'])]
+    public function deleteNoteById(int $id): JsonResponse
+    {
+        try {
+            $note = $this->notesRepository->find($id);
+
+            if (!$note) {
+                return new JsonResponse(
+                    [
+                        "success" => true,
+                        "message" => "Note not found"
+                    ],
+                    Response::HTTP_NOT_FOUND
+                );
+            }
+
+            $this->manager->remove($note);
+            $this->manager->flush();
+
+            return new JsonResponse(
+                [
+                    "success" => true,
+                    "message" => "Note deleted successfully"
+                ],
+                Response::HTTP_OK
+            );
+        } catch (\Throwable $th) {
+            $this->logger->error($th->getMessage());
+
+            return new JsonResponse(
+                [
+                    "success" => false,
+                    "message" => "Error deleting the note"
+                ],
+                Response::HTTP_INTERNAL_SERVER_ERROR
+            );
+        }
+    }
 }
