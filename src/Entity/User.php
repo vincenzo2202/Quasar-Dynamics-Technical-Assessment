@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\UserRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\ORM\Mapping\HasLifecycleCallbacks;
@@ -22,7 +24,7 @@ class User
     private ?string $username = null;
 
     #[ORM\Column(type: "string", length: 100, unique: true)]
-    private ?string $email = null ;
+    private ?string $email = null;
 
     #[ORM\Column(length: 100)]
     private ?string $password = null;
@@ -33,6 +35,46 @@ class User
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     private ?\DateTimeInterface $updated_at = null;
 
+    // Relation with note One To Many
+
+    #[ORM\OneToMany(targetEntity: Notes::class, mappedBy: 'user', cascade: ['persist'])]
+    private $notes;
+
+    public function __construct()
+    {
+        $this->notes = new ArrayCollection();
+    }
+
+    /**
+     * @return Collection<int, Notes>
+     */
+    public function getNotes(): Collection
+    {
+        return $this->notes;
+    }
+
+    public function addNote(Notes $note): self
+    {
+        if (!$this->notes->contains($note)) {
+            $this->notes[] = $note;
+            $note->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeNote(Notes $note): self
+    {
+        if ($this->notes->removeElement($note)) {
+            if ($note->getUser() === $this) {
+                $note->setUser(null);
+            }
+        }
+
+        return $this;
+    }
+
+    // -------
     public function getId(): ?int
     {
         return $this->id;
@@ -98,7 +140,7 @@ class User
         return $this;
     }
 
-     /**
+    /**
      * @ORM\PrePersist
      */
     public function prePersist(): void
@@ -114,5 +156,4 @@ class User
     {
         $this->updated_at = new \DateTime();
     }
-
 }

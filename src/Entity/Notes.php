@@ -23,7 +23,7 @@ class Notes
     #[ORM\Column(length: 255)]
     private ?string $note = null;
 
-    #[ORM\ManyToOne]
+    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: "notes")]
     #[ORM\JoinColumn(nullable: false)]
     private ?User $user = null;
 
@@ -62,14 +62,14 @@ class Notes
         return $this;
     }
 
-    public function getUserId(): ?User
+    public function getUser(): ?User
     {
         return $this->user;
     }
 
-    public function setUserId(?User $user_id): static
+    public function setUser(?User $user): static
     {
-        $this->user = $user_id;
+        $this->user = $user;
 
         return $this;
     }
