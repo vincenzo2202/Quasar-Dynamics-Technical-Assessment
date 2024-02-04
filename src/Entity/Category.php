@@ -11,7 +11,6 @@ use Doctrine\ORM\Mapping\HasLifecycleCallbacks;
 
 #[ORM\Entity(repositoryClass: CategoryRepository::class)]
 #[HasLifecycleCallbacks]
-
 class Category
 {
     #[ORM\Id]
@@ -31,25 +30,13 @@ class Category
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     private ?\DateTimeInterface $updated_at = null;
 
-    // relation with Notes ManytoMany
-
-    #[ORM\ManyToMany(targetEntity: Notes::class, mappedBy: "category")]
-    private $notes;
+    #[ORM\OneToMany(targetEntity: CategoryNote::class, mappedBy: 'category')]
+    private $categoryNotes;
 
     public function __construct()
     {
-        $this->notes = new ArrayCollection();
+        $this->categoryNotes = new ArrayCollection();
     }
-
-    /**
-     * @return Collection|Notes[]
-     */
-    public function getNotes(): Collection
-    {
-        return $this->notes;
-    }
-
-    // 
 
     public function getId(): ?int
     {
@@ -119,5 +106,13 @@ class Category
     public function preUpdate(): void
     {
         $this->updated_at = new \DateTime();
+    }
+
+    /**
+     * @return Collection|CategoryNote[]
+     */
+    public function getCategoryNotes(): Collection
+    {
+        return $this->categoryNotes;
     }
 }

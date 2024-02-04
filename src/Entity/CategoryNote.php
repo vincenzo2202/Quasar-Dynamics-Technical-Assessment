@@ -13,11 +13,11 @@ class CategoryNote
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\ManyToOne(targetEntity:Category::class, inversedBy:"categoryNotes")]
+    #[ORM\ManyToOne(targetEntity: Category::class, inversedBy: "categoryNotes")]
     #[ORM\JoinColumn(nullable: false)]
     private ?Category $category = null;
 
-    #[ORM\ManyToOne(targetEntity:Notes::class, inversedBy:"categoryNotes")]
+    #[ORM\ManyToOne(targetEntity: Notes::class, inversedBy: "categoryNotes")]
     #[ORM\JoinColumn(nullable: false)]
     private ?Notes $note = null;
 

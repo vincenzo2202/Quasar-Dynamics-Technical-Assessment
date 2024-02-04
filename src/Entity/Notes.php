@@ -11,7 +11,6 @@ use Doctrine\ORM\Mapping\HasLifecycleCallbacks;
 
 #[ORM\Entity(repositoryClass: NotesRepository::class)]
 #[HasLifecycleCallbacks]
-
 class Notes
 {
     #[ORM\Id]
@@ -35,41 +34,43 @@ class Notes
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     private ?\DateTimeInterface $updated_at = null;
 
-    // relation with Category ManytoMany
-
-    #[ORM\ManyToMany(targetEntity: Category::class, inversedBy: "notes")]
-    private $categories;
+    #[ORM\OneToMany(targetEntity: CategoryNote::class, mappedBy: 'note')]
+    private $categoryNotes;
 
     public function __construct()
     {
-        $this->categories = new ArrayCollection();
+        $this->categoryNotes = new ArrayCollection();
     }
 
     /**
-     * @return Collection|Category[]
+     * @return Collection|CategoryNote[]
      */
-    public function getCategories(): Collection
+    public function getCategoryNotes(): Collection
     {
-        return $this->categories;
+        return $this->categoryNotes;
     }
 
-    public function addCategory(Category $category): self
+    public function addCategoryNote(CategoryNote $categoryNote): self
     {
-        if (!$this->categories->contains($category)) {
-            $this->categories[] = $category;
+        if (!$this->categoryNotes->contains($categoryNote)) {
+            $this->categoryNotes[] = $categoryNote;
+            $categoryNote->setNote($this);
         }
 
         return $this;
     }
 
-    public function removeCategory(Category $category): self
+    public function removeCategoryNote(CategoryNote $categoryNote): self
     {
-        $this->categories->removeElement($category);
+        if ($this->categoryNotes->removeElement($categoryNote)) {
+            // set the owning side to null (unless already changed)
+            if ($categoryNote->getNote() === $this) {
+                $categoryNote->setNote(null);
+            }
+        }
 
         return $this;
     }
-
-    // 
 
     public function getId(): ?int
     {
