@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\CategoryRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\ORM\Mapping\HasLifecycleCallbacks;
@@ -28,6 +30,26 @@ class Category
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     private ?\DateTimeInterface $updated_at = null;
+
+    // relation with Notes ManytoMany
+
+    #[ORM\ManyToMany(targetEntity: Notes::class, mappedBy: "category")]
+    private $notes;
+
+    public function __construct()
+    {
+        $this->notes = new ArrayCollection();
+    }
+
+    /**
+     * @return Collection|Notes[]
+     */
+    public function getNotes(): Collection
+    {
+        return $this->notes;
+    }
+
+    // 
 
     public function getId(): ?int
     {
@@ -82,7 +104,7 @@ class Category
         return $this;
     }
 
-      /**
+    /**
      * @ORM\PrePersist
      */
     public function prePersist(): void
@@ -98,5 +120,4 @@ class Category
     {
         $this->updated_at = new \DateTime();
     }
-
 }
