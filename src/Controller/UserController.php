@@ -41,7 +41,6 @@ class UserController extends AbstractController
                 ],
                 Response::HTTP_OK
             );
-            
         } catch (\Throwable $th) {
             $this->logger->error($th->getMessage());
 
@@ -49,6 +48,47 @@ class UserController extends AbstractController
                 [
                     "success" => false,
                     "message" => "Error obtaining the users"
+                ],
+                Response::HTTP_INTERNAL_SERVER_ERROR
+            );
+        }
+    }
+
+    // Get user by id
+    #[Route('/user/{id}', methods: ['GET'])]
+    public function getUserById(int $id): JsonResponse
+    {
+        try {
+ 
+            $user = $this->userRepository->find($id);
+
+            if (!$user) {
+                return new JsonResponse(
+                    [
+                        "success" => true,
+                        "message" => "User not found"
+                    ],
+                    Response::HTTP_NOT_FOUND
+                );
+            }
+
+            $data = $this->serializer->serialize($user, 'json');
+
+            return new JsonResponse(
+                [
+                    "success" => true,
+                    "message" => "User obtained successfully",
+                    "data" => json_decode($data)
+                ],
+                Response::HTTP_OK
+            );
+        } catch (\Throwable $th) {
+            $this->logger->error($th->getMessage());
+
+            return new JsonResponse(
+                [
+                    "success" => false,
+                    "message" => "Error obtaining the user"
                 ],
                 Response::HTTP_INTERNAL_SERVER_ERROR
             );

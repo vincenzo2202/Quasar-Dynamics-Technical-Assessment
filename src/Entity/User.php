@@ -158,7 +158,7 @@ class User implements JsonSerializable
         $this->updated_at = new \DateTime();
     }
 
-    public function jsonSerialize()
+    public function jsonSerialize():mixed
     {
         return [
             'id' => $this->getId(),
