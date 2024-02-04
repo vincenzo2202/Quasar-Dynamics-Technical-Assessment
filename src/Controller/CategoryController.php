@@ -215,4 +215,64 @@ class CategoryController extends AbstractController
             );
         }
     }
+
+    // Update a category
+    #[Route('/category/{id}/update', methods: ['PUT'])]
+    public function updateCategory(int $id, Request $request): JsonResponse
+    {
+        try {
+            $data = json_decode($request->getContent(), true);
+
+            $category = $this->categoryRepository->find($id); 
+
+            if (!$category) {
+                return new JsonResponse(
+                    [
+                        "success" => true,
+                        "message" => "Category not found"
+                    ],
+                    Response::HTTP_NOT_FOUND
+                );
+            }
+
+            $validator = $this->validateCategory($data);
+
+            if ($validator) {
+                return new JsonResponse(
+                    [
+                        "success" => true,
+                        "message" => "Invalid data",
+                        "errors" => $validator
+                    ],
+                    Response::HTTP_BAD_REQUEST
+                );
+            }
+
+            $category->setCategory($data["category"]);
+            $category->setDescription($data["description"]);
+            $category->setUpdatedAt(new \DateTime());
+
+            $this->manager->persist($category);
+            $this->manager->flush();
+
+            return new JsonResponse(
+                [
+                    "success" => true,
+                    "message" => "Category updated successfully",
+                    "data" => $data
+                ],
+                Response::HTTP_OK
+            );
+        } catch (\Throwable $th) {
+            $this->logger->error($th->getMessage());
+
+            return new JsonResponse(
+                [
+                    "success" => false,
+                    "message" => "Error updating the category"
+                ],
+                Response::HTTP_INTERNAL_SERVER_ERROR
+            );
+        }
+    }
 }
