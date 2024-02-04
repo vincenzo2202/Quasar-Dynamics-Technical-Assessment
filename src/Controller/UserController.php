@@ -22,15 +22,15 @@ class UserController extends AbstractController
     private SerializerInterface $serializer;
     private LoggerInterface $logger;
     private UserPasswordHasherInterface $passwordEncrypted;
-    private EntityManagerInterface $em;
+    private EntityManagerInterface $manager;
 
-    public function __construct(UserRepository $userRepository, SerializerInterface $serializer, LoggerInterface $logger, UserPasswordHasherInterface  $passwordEncrypted, EntityManagerInterface $em)
+    public function __construct(UserRepository $userRepository, SerializerInterface $serializer, LoggerInterface $logger, UserPasswordHasherInterface  $passwordEncrypted, EntityManagerInterface $manager)
     {
         $this->userRepository = $userRepository;
         $this->serializer = $serializer;
         $this->logger = $logger;
         $this->passwordEncrypted = $passwordEncrypted;
-        $this->em = $em;
+        $this->manager = $manager;
     }
 
     // Get all users 
@@ -145,7 +145,7 @@ class UserController extends AbstractController
 
     // Create user
     #[Route('/register', methods: ['POST'])]
-    public function Register(Request $request, UserPasswordHasherInterface $passwordEncrypted, EntityManagerInterface  $em): JsonResponse
+    public function Register(Request $request, UserPasswordHasherInterface $passwordEncrypted, EntityManagerInterface  $manager): JsonResponse
     {
         try {
             $data = json_decode($request->getContent(), true);
@@ -170,8 +170,8 @@ class UserController extends AbstractController
             $newUser->setCreatedAt(new \DateTime());
             $newUser->setUpdatedAt(new \DateTime());
 
-            $em->persist($newUser);
-            $em->flush();
+            $manager->persist($newUser);
+            $manager->flush();
 
             return new JsonResponse(
                 [
@@ -334,7 +334,7 @@ class UserController extends AbstractController
             }
             $user->setUpdatedAt(new \DateTime());
 
-            $this->em->flush();
+            $this->manager->flush();
 
             return new JsonResponse(
                 [
@@ -355,6 +355,46 @@ class UserController extends AbstractController
                 [
                     "success" => false,
                     "message" => "Error updating the user"
+                ],
+                Response::HTTP_INTERNAL_SERVER_ERROR
+            );
+        }
+    }
+
+    // Delete user
+    #[Route('/user/{id}/delete', methods: ['DELETE'])]
+    public function deleteUser(int $id): JsonResponse
+    {
+        try {
+            $user = $this->userRepository->find($id);
+
+            if (!$user) {
+                return new JsonResponse(
+                    [
+                        "success" => true,
+                        "message" => "User not found"
+                    ],
+                    Response::HTTP_NOT_FOUND
+                );
+            }
+
+            $this->manager->remove($user);
+            $this->manager->flush();
+
+            return new JsonResponse(
+                [
+                    "success" => true,
+                    "message" => "User deleted successfully"
+                ],
+                Response::HTTP_OK
+            );
+        } catch (\Throwable $th) {
+            $this->logger->error($th->getMessage());
+
+            return new JsonResponse(
+                [
+                    "success" => false,
+                    "message" => "Error deleting the user"
                 ],
                 Response::HTTP_INTERNAL_SERVER_ERROR
             );
