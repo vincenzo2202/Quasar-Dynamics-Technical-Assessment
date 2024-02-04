@@ -171,7 +171,7 @@ class NotesController extends AbstractController
             if ($validator) {
                 return new JsonResponse(
                     [
-                        "success" => false,
+                        "success" => true,
                         "message" => "Error creating the note",
                         "errors" => $validator
                     ],
@@ -187,7 +187,7 @@ class NotesController extends AbstractController
             if (!$user) {
                 return new JsonResponse(
                     [
-                        "success" => false,
+                        "success" => true,
                         "message" => "User not found"
                     ],
                     Response::HTTP_NOT_FOUND
