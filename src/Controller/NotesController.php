@@ -138,7 +138,7 @@ class NotesController extends AbstractController
                     'min' => 3,
                     'max' => 255,
                     'maxMessage' => 'The note cannot be longer than {{ 255 }} characters'
-                ]), 
+                ]),
                 new Assert\Regex([
                     'pattern' => '/\S/',
                     'message' => 'The note must contain letters or numbers'
@@ -182,7 +182,7 @@ class NotesController extends AbstractController
             $user = $this->manager
                 ->getRepository(User::class)
                 ->find($data['user_id']);
- 
+
 
             if (!$user) {
                 return new JsonResponse(
@@ -193,7 +193,7 @@ class NotesController extends AbstractController
                     Response::HTTP_NOT_FOUND
                 );
             }
- 
+
             $note = new Notes();
             $note->setUser($user);
             $note->setTitle($data['title']);
@@ -211,7 +211,8 @@ class NotesController extends AbstractController
                     "data" => [
                         "id" => $note->getId(),
                         "title" => $note->getTitle(),
-                        "note" => $note->getNote()]
+                        "note" => $note->getNote()
+                    ]
                 ],
                 Response::HTTP_CREATED
             );
@@ -222,6 +223,129 @@ class NotesController extends AbstractController
                 [
                     "success" => false,
                     "message" => "Error creating the note"
+                ],
+                Response::HTTP_INTERNAL_SERVER_ERROR
+            );
+        }
+    }
+
+    // Validate Update Note
+    private function validateNoteUpdate(array $data)
+    {
+        $validator = Validation::createValidator();
+
+        $validations = new Assert\Collection([
+            'title' =>  [
+                new Assert\NotBlank(),
+                new Assert\Type([
+                    'type' => 'string',
+                    'message' => 'The title must be a string'
+                ]),
+                new Assert\Length([
+                    'min' => 3,
+                    'max' => 100,
+                    'maxMessage' => 'The title cannot be longer than {{ 100 }} characters'
+                ]),
+                new Assert\Regex([
+                    'pattern' => '/\S/',
+                    'message' => 'The title must contain letters or numbers'
+                ]),
+            ],
+            'note' =>  [
+                new Assert\NotBlank(),
+                new Assert\Type([
+                    'type' => 'string',
+                    'message' => 'The note must be a string'
+                ]),
+                new Assert\Length([
+                    'min' => 3,
+                    'max' => 255,
+                    'maxMessage' => 'The note cannot be longer than {{ 255 }} characters'
+                ]),
+                new Assert\Regex([
+                    'pattern' => '/\S/',
+                    'message' => 'The note must contain letters or numbers'
+                ]),
+            ],
+        ]);
+
+        $violations = $validator->validate($data, $validations);
+
+        if (count($violations) > 0) {
+            $errors = [];
+            foreach ($violations as $violation) {
+                $errors[$violation->getPropertyPath()][] = $violation->getMessage();
+            }
+            return $errors;
+        }
+
+        return null;
+    }
+
+    // Update a note
+    #[Route('/note/{id}/update', methods: ['PUT'])]
+    public function updateNote(int $id, Request $request): JsonResponse
+    {
+        try {
+            $data = json_decode($request->getContent(), true);
+
+            $note = $this->notesRepository->find($id);
+
+            if (!$note) {
+                return new JsonResponse(
+                    [
+                        "success" => true,
+                        "message" => "Note not found"
+                    ],
+                    Response::HTTP_NOT_FOUND
+                );
+            }
+
+            $validator = $this->validateNoteUpdate($data);
+
+            if ($validator !== null) {
+                return new JsonResponse(
+                    [
+                        "success" => true,
+                        "message" => "Error updating the note",
+                        "errors" => $validator
+                    ],
+                    Response::HTTP_BAD_REQUEST
+                );
+            }
+
+            if (isset($data['title'])) {
+                $note->setTitle($data['title']);
+            }
+
+            if (isset($data['note'])) {
+                $note->setNote($data['note']);
+            }
+
+            $note->setUpdatedAt(new \DateTime());
+
+            $this->manager->persist($note);
+            $this->manager->flush();
+
+            return new JsonResponse(
+                [
+                    "success" => true,
+                    "message" => "Note updated successfully",
+                    "data" => [
+                        "id" => $note->getId(),
+                        "title" => $note->getTitle(),
+                        "note" => $note->getNote()
+                    ]
+                ],
+                Response::HTTP_OK
+            );
+        } catch (\Throwable $th) {
+            $this->logger->error($th->getMessage());
+
+            return new JsonResponse(
+                [
+                    "success" => false,
+                    "message" => "Error updating the note"
                 ],
                 Response::HTTP_INTERNAL_SERVER_ERROR
             );
