@@ -197,4 +197,57 @@ class UserController extends AbstractController
             );
         }
     }
+
+    // login
+    #[Route('/login', methods: ['POST'])]
+    public function login(Request $request, UserPasswordHasherInterface $passwordEncrypted): JsonResponse
+    {
+        try {
+            $data = json_decode($request->getContent(), true);
+
+            if (!isset($data['email'], $data['password'])) {
+                return new JsonResponse(
+                    [
+                        "success" => false,
+                        "message" => "Missing email or password"
+                    ],
+                    Response::HTTP_BAD_REQUEST
+                );
+            }
+    
+            $user = $this->userRepository->findOneBy(['email' => $data['email']]);
+
+            if (!$user || !$passwordEncrypted->isPasswordValid($user, $data['password'])) {
+                return new JsonResponse(
+                    [
+                        "success" => false,
+                        "message" => "Invalid credentials"
+                    ],
+                    Response::HTTP_UNAUTHORIZED
+                );
+            }
+
+            $token =  bin2hex(random_bytes(32));
+
+            return new JsonResponse(
+                [
+                    "success" => true,
+                    "message" => "Login successfully",
+                    "token" => $token
+                     
+                ],
+                Response::HTTP_OK
+            );
+        } catch (\Throwable $th) {
+            $this->logger->error($th->getMessage());
+
+            return new JsonResponse(
+                [
+                    "success" => false,
+                    "message" => "Error logging in"
+                ],
+                Response::HTTP_INTERNAL_SERVER_ERROR
+            );
+        }
+    }
 }
