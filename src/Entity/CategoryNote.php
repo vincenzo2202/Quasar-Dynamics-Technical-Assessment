@@ -4,9 +4,11 @@ namespace App\Entity;
 
 use App\Repository\CategoryNoteRepository;
 use Doctrine\ORM\Mapping as ORM;
+use JsonSerializable;
 
 #[ORM\Entity(repositoryClass: CategoryNoteRepository::class)]
-class CategoryNote
+
+class CategoryNote implements JsonSerializable
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -48,5 +50,14 @@ class CategoryNote
         $this->note = $note;
 
         return $this;
+    }
+
+    public function jsonSerialize():mixed
+    {
+        return [
+            "id" => $this->id,
+            "category" => $this->category,
+            "note" => $this->note
+        ];
     }
 }
