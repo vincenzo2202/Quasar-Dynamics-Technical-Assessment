@@ -53,7 +53,7 @@ class NotesController extends AbstractController
             return new JsonResponse(
                 [
                     "success" => false,
-                    "message" => "Error obtaining the users"
+                    "message" => "Error obtaining the notes"
                 ],
                 Response::HTTP_INTERNAL_SERVER_ERROR
             );

@@ -8,10 +8,12 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\ORM\Mapping\HasLifecycleCallbacks;
+use JsonSerializable;
 
 #[ORM\Entity(repositoryClass: CategoryRepository::class)]
 #[HasLifecycleCallbacks]
-class Category
+
+class Category implements JsonSerializable
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -114,5 +116,16 @@ class Category
     public function getCategoryNotes(): Collection
     {
         return $this->categoryNotes;
+    }
+
+    public function jsonSerialize():mixed
+    {
+        return [
+            'id' => $this->id,
+            'category' => $this->category,
+            'description' => $this->description,
+            'created_at' => $this->created_at,
+            'updated_at' => $this->updated_at,
+        ];
     }
 }
