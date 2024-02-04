@@ -55,5 +55,44 @@ class CategoryController extends AbstractController
         }
     }
 
-    
+    // Get a category by id
+    #[Route('/category/{id}', methods: ['GET'])]
+    public function getCategory(int $id): JsonResponse
+    {
+        try {
+            $category = $this->categoryRepository->find($id);
+
+            if (!$category) {
+                return new JsonResponse(
+                    [
+                        "success" => true,
+                        "message" => "Category not found"
+                    ],
+                    Response::HTTP_NOT_FOUND
+                );
+            }
+            $data = $this->serializer->serialize($category, 'json');
+
+            return new JsonResponse(
+                [
+                    "success" => true,
+                    "message" => "Category obtained successfully",
+                    "data" => json_decode($data)
+                ],
+                Response::HTTP_OK
+            );
+        } catch (\Throwable $th) {
+            $this->logger->error($th->getMessage());
+
+            return new JsonResponse(
+                [
+                    "success" => false,
+                    "message" => "Error obtaining the category"
+                ],
+                Response::HTTP_INTERNAL_SERVER_ERROR
+            );
+        }
+    }
+
+
 }
