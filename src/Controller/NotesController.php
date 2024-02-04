@@ -16,14 +16,14 @@ class NotesController extends AbstractController
 
     private NotesRepository $notesRepository;
     private SerializerInterface $serializer;
-    private LoggerInterface $logger; 
+    private LoggerInterface $logger;
     private EntityManagerInterface $manager;
 
     public function __construct(NotesRepository $notesRepository, SerializerInterface $serializer, LoggerInterface $logger, EntityManagerInterface $manager)
     {
         $this->notesRepository = $notesRepository;
         $this->serializer = $serializer;
-        $this->logger = $logger; 
+        $this->logger = $logger;
         $this->manager = $manager;
     }
     // Get all notes
@@ -49,6 +49,45 @@ class NotesController extends AbstractController
                 [
                     "success" => false,
                     "message" => "Error obtaining the users"
+                ],
+                Response::HTTP_INTERNAL_SERVER_ERROR
+            );
+        }
+    }
+
+    // Get a note by id
+    #[Route('/note/{id}', methods: ['GET'])]
+    public function getNoteById(int $id): JsonResponse
+    {
+        try {
+            $note = $this->notesRepository->find($id);
+
+            if (!$note) {
+                return new JsonResponse(
+                    [
+                        "success" => true,
+                        "message" => "Note not found"
+                    ],
+                    Response::HTTP_NOT_FOUND
+                );
+            }
+            $data = $this->serializer->serialize($note, 'json');
+
+            return new JsonResponse(
+                [
+                    "success" => true,
+                    "message" => "Note obtained successfully",
+                    "data" => json_decode($data)
+                ],
+                Response::HTTP_OK
+            );
+        } catch (\Throwable $th) {
+            $this->logger->error($th->getMessage());
+
+            return new JsonResponse(
+                [
+                    "success" => false,
+                    "message" => "Error obtaining the note"
                 ],
                 Response::HTTP_INTERNAL_SERVER_ERROR
             );
