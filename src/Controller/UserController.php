@@ -208,19 +208,19 @@ class UserController extends AbstractController
             if (!isset($data['email'], $data['password'])) {
                 return new JsonResponse(
                     [
-                        "success" => false,
+                        "success" => true,
                         "message" => "Missing email or password"
                     ],
                     Response::HTTP_BAD_REQUEST
                 );
             }
-    
+
             $user = $this->userRepository->findOneBy(['email' => $data['email']]);
 
             if (!$user || !$passwordEncrypted->isPasswordValid($user, $data['password'])) {
                 return new JsonResponse(
                     [
-                        "success" => false,
+                        "success" => true,
                         "message" => "Invalid credentials"
                     ],
                     Response::HTTP_UNAUTHORIZED
@@ -234,7 +234,7 @@ class UserController extends AbstractController
                     "success" => true,
                     "message" => "Login successfully",
                     "token" => $token
-                     
+
                 ],
                 Response::HTTP_OK
             );
@@ -245,6 +245,116 @@ class UserController extends AbstractController
                 [
                     "success" => false,
                     "message" => "Error logging in"
+                ],
+                Response::HTTP_INTERNAL_SERVER_ERROR
+            );
+        }
+    }
+
+    private function validateUpdate(array $data)
+    {
+        $validator = Validation::createValidator();
+
+        $validations = new Assert\Collection([
+            'username' =>  [
+                new Assert\NotBlank(),
+                new Assert\Length(['min' => 3, 'max' => 50])
+            ],
+            'email' => [
+                new Assert\NotBlank(),
+                new Assert\Regex([
+                    'pattern' => '/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/',
+                    'message' => 'The email is not valid'
+                ])
+            ] 
+        ]);
+
+        $violations = $validator->validate($data, $validations);
+
+        if (count($violations) > 0) {
+            $errors = [];
+            foreach ($violations as $violation) {
+                $errors[$violation->getPropertyPath()][] = $violation->getMessage();
+            }
+            return $errors;
+        }
+
+        return null;
+    }
+
+    // Update user
+    #[Route('/user/{id}/update ', methods: ['PUT'])]
+    public function updateUser(int $id, Request $request): JsonResponse
+    {
+        try {
+            $data = json_decode($request->getContent(), true); 
+
+            $user = $this->userRepository->find($id);
+
+            if (!$user) {
+                return new JsonResponse(
+                    [
+                        "success" => true,
+                        "message" => "User not found"
+                    ],
+                    Response::HTTP_NOT_FOUND
+                );
+            }
+
+            $validator = $this->validateUpdate($data);
+
+            if ($validator !== null) {
+                return new JsonResponse(
+                    [
+                        "success" => true,
+                        "message" => "Error registering user",
+                        "errors" => $validator
+                    ],
+                    Response::HTTP_BAD_REQUEST
+                );
+            }
+
+            if (isset($data['username'])) {
+                $user->setUsername($data['username']);
+            }
+
+            if (isset($data['email'])) {
+                $existingUser = $this->userRepository->findOneBy(['email' => $data['email']]);
+                if ($existingUser) {
+                    return new JsonResponse(
+                        [
+                            "success" => true,
+                            "message" => "Email invalid, try again."
+                        ],
+                        Response::HTTP_BAD_REQUEST
+                    );
+                } else {
+                    $user->setEmail($data['email']); 
+                }
+            }
+            $user->setUpdatedAt(new \DateTime());
+
+            $this->em->flush();
+
+            return new JsonResponse(
+                [
+                    "success" => true,
+                    "message" => "User updated successfully",
+                    "data" => [
+                        "id" => $user->getId(),
+                        "username" => $user->getUsername(),
+                        "email" => $user->getEmail()
+                    ]
+                ],
+                Response::HTTP_OK
+            );
+        } catch (\Throwable $th) {
+            $this->logger->error($th->getMessage());
+
+            return new JsonResponse(
+                [
+                    "success" => false,
+                    "message" => "Error updating the user"
                 ],
                 Response::HTTP_INTERNAL_SERVER_ERROR
             );
