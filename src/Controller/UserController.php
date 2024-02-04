@@ -24,7 +24,7 @@ class UserController extends AbstractController
     private UserPasswordHasherInterface $passwordEncrypted;
     private EntityManagerInterface $em;
 
-    public function __construct(UserRepository $userRepository, SerializerInterface $serializer, LoggerInterface $logger, UserPasswordHasherInterface  $passwordEncrypted,EntityManagerInterface $em)
+    public function __construct(UserRepository $userRepository, SerializerInterface $serializer, LoggerInterface $logger, UserPasswordHasherInterface  $passwordEncrypted, EntityManagerInterface $em)
     {
         $this->userRepository = $userRepository;
         $this->serializer = $serializer;
@@ -111,11 +111,10 @@ class UserController extends AbstractController
         $validations = new Assert\Collection([
             'username' =>  [
                 new Assert\NotBlank(),
-                new Assert\Length(['min' => 5, 'max' => 50])
+                new Assert\Length(['min' => 3, 'max' => 50])
             ],
             'email' => [
                 new Assert\NotBlank(),
-                new Assert\Email(),
                 new Assert\Regex([
                     'pattern' => '/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/',
                     'message' => 'The email is not valid'
@@ -146,7 +145,7 @@ class UserController extends AbstractController
 
     // Create user
     #[Route('/register', methods: ['POST'])]
-    public function Register(Request $request, UserPasswordHasherInterface $passwordEncrypted,EntityManagerInterface  $em): JsonResponse
+    public function Register(Request $request, UserPasswordHasherInterface $passwordEncrypted, EntityManagerInterface  $em): JsonResponse
     {
         try {
             $data = json_decode($request->getContent(), true);
@@ -169,17 +168,20 @@ class UserController extends AbstractController
             $newUser->setEmail($data['email']);
             $newUser->setPassword($passwordEncrypted->hashPassword($newUser, $data['password']));
             $newUser->setCreatedAt(new \DateTime());
-            $newUser->setUpdatedAt(new \DateTime()); 
+            $newUser->setUpdatedAt(new \DateTime());
 
-            $em->persist($newUser); 
+            $em->persist($newUser);
             $em->flush();
-
-
 
             return new JsonResponse(
                 [
                     "success" => true,
-                    "message" => "User created successfully"
+                    "message" => "User created successfully",
+                    "data" => [
+                        "id" => $newUser->getId(),
+                        "username" => $newUser->getUsername(),
+                        "email" => $newUser->getEmail()
+                    ]
                 ],
                 Response::HTTP_OK
             );
