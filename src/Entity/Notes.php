@@ -8,10 +8,12 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\ORM\Mapping\HasLifecycleCallbacks;
+use JsonSerializable;
 
 #[ORM\Entity(repositoryClass: NotesRepository::class)]
 #[HasLifecycleCallbacks]
-class Notes
+
+class Notes implements JsonSerializable
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -152,5 +154,17 @@ class Notes
     public function preUpdate(): void
     {
         $this->updated_at = new \DateTime();
+    }
+
+    public function jsonSerialize()
+    {
+        return [
+            'id' => $this->id,
+            'title' => $this->title,
+            'note' => $this->note,
+            'user' => $this->user,
+            'created_at' => $this->created_at,
+            'updated_at' => $this->updated_at
+        ];
     }
 }

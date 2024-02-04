@@ -14,7 +14,6 @@ use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[HasLifecycleCallbacks]
 
-
 class User implements JsonSerializable, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]

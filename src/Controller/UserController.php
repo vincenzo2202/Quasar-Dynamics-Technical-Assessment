@@ -39,7 +39,6 @@ class UserController extends AbstractController
     {
         try {
             $users = $this->userRepository->findAll();
-
             $data = $this->serializer->serialize($users, 'json');
 
             return new JsonResponse(
