@@ -22,14 +22,14 @@ class NotesController extends AbstractController
     private NotesRepository $notesRepository;
     private SerializerInterface $serializer;
     private LoggerInterface $logger;
-    private EntityManagerInterface $manager;
+    private EntityManagerInterface $manager; 
 
     public function __construct(NotesRepository $notesRepository, SerializerInterface $serializer, LoggerInterface $logger, EntityManagerInterface $manager)
     {
         $this->notesRepository = $notesRepository;
         $this->serializer = $serializer;
         $this->logger = $logger;
-        $this->manager = $manager;
+        $this->manager = $manager; 
     }
     // Get all notes
     #[Route('/notes', methods: ['GET'])]
@@ -386,6 +386,36 @@ class NotesController extends AbstractController
                 [
                     "success" => false,
                     "message" => "Error deleting the note"
+                ],
+                Response::HTTP_INTERNAL_SERVER_ERROR
+            );
+        }
+    }
+ 
+    // Get all expired notes
+
+    #[Route('/expiredNotes', methods: ['GET'])]
+    public function expiredNotes(): JsonResponse
+    {
+        try {
+            $notes = $this->notesRepository->expired();
+            $data = $this->serializer->serialize($notes, 'json', ['groups' => 'note']);
+
+            return new JsonResponse(
+                [
+                    "success" => true,
+                    "message" => "Notes obtained successfully",
+                    "data" => json_decode($data, true), 
+                ],
+                Response::HTTP_OK
+            );
+        } catch (\Throwable $th) {
+            $this->logger->error($th->getMessage());
+
+            return new JsonResponse(
+                [
+                    "success" => false,
+                    "message" => "Error obtaining the notes"
                 ],
                 Response::HTTP_INTERNAL_SERVER_ERROR
             );
