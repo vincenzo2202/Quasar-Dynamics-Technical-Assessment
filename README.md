@@ -47,7 +47,12 @@ Developed as part of the Quasar Dynamics Technical Assessment.
 2. Install the dependencies required for the project. 
 
     - ` $ composer install`
-3. Create the database:    
+3. Create the database: 
+    - create file .env.local with DB credentials 
+
+        ```
+       DATABASE_URL="mysql://<username>:<password>@<host>:<port>/<database_name>?serverVersion=<server_version>&charset=utf8mb4"
+        ```
     - ` $ php bin/console doctrine:database:create`
 4.  Run the migrations:
     - `$ php bin/console doctrine:migrations:migrate `
