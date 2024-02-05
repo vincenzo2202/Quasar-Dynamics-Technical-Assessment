@@ -37,13 +37,13 @@ class NotesController extends AbstractController
     {
         try {
             $notes = $this->notesRepository->findAll();
-            $data = $this->serializer->serialize($notes, 'json');
+            $data = $this->serializer->serialize($notes, 'json', ['groups' => 'note']);
 
             return new JsonResponse(
                 [
                     "success" => true,
                     "message" => "Notes obtained successfully",
-                    "data" => json_decode($data)
+                    "data" => json_decode($data, true), 
                 ],
                 Response::HTTP_OK
             );
@@ -76,7 +76,7 @@ class NotesController extends AbstractController
                     Response::HTTP_NOT_FOUND
                 );
             }
-            $data = $this->serializer->serialize($note, 'json');
+            $data = $this->serializer->serialize($note, 'json',['groups' => 'note']);
 
             return new JsonResponse(
                 [

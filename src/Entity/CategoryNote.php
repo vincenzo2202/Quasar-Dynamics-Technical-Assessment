@@ -5,6 +5,7 @@ namespace App\Entity;
 use App\Repository\CategoryNoteRepository;
 use Doctrine\ORM\Mapping as ORM;
 use JsonSerializable;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: CategoryNoteRepository::class)]
 
@@ -16,12 +17,15 @@ class CategoryNote implements JsonSerializable
     private ?int $id = null;
 
     #[ORM\ManyToOne(targetEntity: Category::class, inversedBy: "categoryNotes")]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\JoinColumn(nullable: false)] 
+    #[Groups(['note'])]
     private ?Category $category = null;
 
     #[ORM\ManyToOne(targetEntity: Notes::class, inversedBy: "categoryNotes")]
     #[ORM\JoinColumn(nullable: false)]
     private ?Notes $note = null;
+
+    
 
     public function getId(): ?int
     {

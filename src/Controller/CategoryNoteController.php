@@ -17,7 +17,6 @@ use Symfony\Component\Serializer\SerializerInterface;
 
 class CategoryNoteController extends AbstractController
 {
-
     private CategoryNoteRepository $categoryNoteRepository;
     private SerializerInterface $serializer;
     private LoggerInterface $logger;

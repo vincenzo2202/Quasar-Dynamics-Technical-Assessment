@@ -9,6 +9,7 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\ORM\Mapping\HasLifecycleCallbacks;
 use JsonSerializable;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: NotesRepository::class)]
 #[HasLifecycleCallbacks]
@@ -37,7 +38,8 @@ class Notes implements JsonSerializable
     private ?\DateTimeInterface $updated_at = null;
 
     #[ORM\OneToMany(targetEntity: CategoryNote::class, mappedBy: 'note')]
-    private $categoryNotes;
+    #[Groups(['note'])]
+    private Collection $categoryNotes;
 
     public function __construct()
     {
@@ -65,7 +67,6 @@ class Notes implements JsonSerializable
     public function removeCategoryNote(CategoryNote $categoryNote): self
     {
         if ($this->categoryNotes->removeElement($categoryNote)) {
-            // set the owning side to null (unless already changed)
             if ($categoryNote->getNote() === $this) {
                 $categoryNote->setNote(null);
             }
@@ -156,13 +157,19 @@ class Notes implements JsonSerializable
         $this->updated_at = new \DateTime();
     }
 
-    public function jsonSerialize():mixed
+    public function jsonSerialize(): mixed
     {
         return [
             'id' => $this->id,
             'title' => $this->title,
             'note' => $this->note,
             'user' => $this->user,
+            'categoryNotes' => array_map(function ($categoryNote) {
+                return [
+                    'id' => $categoryNote->getId(),
+                    'Category' => $categoryNote->getCategory()->getCategory()
+                ];
+            }, $this->getCategoryNotes()->toArray()),
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at
         ];
