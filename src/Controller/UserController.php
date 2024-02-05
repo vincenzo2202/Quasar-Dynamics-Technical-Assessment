@@ -61,13 +61,11 @@ class UserController extends AbstractController
             );
         }
     }
-
     // Get user by id
     #[Route('/user/{id}', methods: ['GET'])]
     public function getUserById(int $id): JsonResponse
     {
         try {
-
             $user = $this->userRepository->find($id);
 
             if (!$user) {
@@ -102,7 +100,7 @@ class UserController extends AbstractController
             );
         }
     }
-
+    // Register user validator
     private function validateRegister(array $data)
     {
         $validator = Validation::createValidator();
@@ -141,7 +139,6 @@ class UserController extends AbstractController
 
         return null;
     }
-
     // Create user
     #[Route('/register', methods: ['POST'])]
     public function Register(Request $request, UserPasswordHasherInterface $passwordEncrypted, EntityManagerInterface  $manager): JsonResponse
@@ -196,7 +193,6 @@ class UserController extends AbstractController
             );
         }
     }
-
     // login
     #[Route('/login', methods: ['POST'])]
     public function login(Request $request, UserPasswordHasherInterface $passwordEncrypted): JsonResponse
@@ -249,7 +245,7 @@ class UserController extends AbstractController
             );
         }
     }
-
+    // Update user validator
     private function validateUpdate(array $data)
     {
         $validator = Validation::createValidator();
@@ -280,7 +276,6 @@ class UserController extends AbstractController
 
         return null;
     }
-
     // Update user
     #[Route('/user/{id}/update ', methods: ['PUT'])]
     public function updateUser(int $id, Request $request): JsonResponse
@@ -359,7 +354,6 @@ class UserController extends AbstractController
             );
         }
     }
-
     // Delete user
     #[Route('/user/{id}/delete', methods: ['DELETE'])]
     public function deleteUser(int $id): JsonResponse

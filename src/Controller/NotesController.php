@@ -18,18 +18,17 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 class NotesController extends AbstractController
 {
-
     private NotesRepository $notesRepository;
     private SerializerInterface $serializer;
     private LoggerInterface $logger;
-    private EntityManagerInterface $manager; 
+    private EntityManagerInterface $manager;
 
     public function __construct(NotesRepository $notesRepository, SerializerInterface $serializer, LoggerInterface $logger, EntityManagerInterface $manager)
     {
         $this->notesRepository = $notesRepository;
         $this->serializer = $serializer;
         $this->logger = $logger;
-        $this->manager = $manager; 
+        $this->manager = $manager;
     }
     // Get all notes
     #[Route('/notes', methods: ['GET'])]
@@ -43,7 +42,7 @@ class NotesController extends AbstractController
                 [
                     "success" => true,
                     "message" => "Notes obtained successfully",
-                    "data" => json_decode($data, true), 
+                    "data" => json_decode($data, true),
                 ],
                 Response::HTTP_OK
             );
@@ -59,7 +58,6 @@ class NotesController extends AbstractController
             );
         }
     }
-
     // Get a note by id
     #[Route('/note/{id}', methods: ['GET'])]
     public function getNoteById(int $id): JsonResponse
@@ -76,7 +74,7 @@ class NotesController extends AbstractController
                     Response::HTTP_NOT_FOUND
                 );
             }
-            $data = $this->serializer->serialize($note, 'json',['groups' => 'note']);
+            $data = $this->serializer->serialize($note, 'json', ['groups' => 'note']);
 
             return new JsonResponse(
                 [
@@ -98,7 +96,6 @@ class NotesController extends AbstractController
             );
         }
     }
-
     // Validate Note
     private function validateNote(array $data)
     {
@@ -121,7 +118,7 @@ class NotesController extends AbstractController
                 new Assert\Length([
                     'min' => 3,
                     'max' => 100,
-                    'maxMessage' => 'The title cannot be longer than {{ 100 }} characters'
+                    'maxMessage' => 'The title cannot be longer than 100 characters'
                 ]),
                 new Assert\Regex([
                     'pattern' => '/\S/',
@@ -137,7 +134,7 @@ class NotesController extends AbstractController
                 new Assert\Length([
                     'min' => 3,
                     'max' => 255,
-                    'maxMessage' => 'The note cannot be longer than {{ 255 }} characters'
+                    'maxMessage' => 'The note cannot be longer than 255 characters'
                 ]),
                 new Assert\Regex([
                     'pattern' => '/\S/',
@@ -158,7 +155,6 @@ class NotesController extends AbstractController
 
         return null;
     }
-
     // Create a note
     #[Route('/note', methods: ['POST'])]
     public function createNote(Request $request): JsonResponse
@@ -228,7 +224,6 @@ class NotesController extends AbstractController
             );
         }
     }
-
     // Validate Update Note
     private function validateNoteUpdate(array $data)
     {
@@ -244,7 +239,7 @@ class NotesController extends AbstractController
                 new Assert\Length([
                     'min' => 3,
                     'max' => 100,
-                    'maxMessage' => 'The title cannot be longer than {{ 100 }} characters'
+                    'maxMessage' => 'The title cannot be longer than 100 characters'
                 ]),
                 new Assert\Regex([
                     'pattern' => '/\S/',
@@ -260,7 +255,7 @@ class NotesController extends AbstractController
                 new Assert\Length([
                     'min' => 3,
                     'max' => 255,
-                    'maxMessage' => 'The note cannot be longer than {{ 255 }} characters'
+                    'maxMessage' => 'The note cannot be longer than 255 characters'
                 ]),
                 new Assert\Regex([
                     'pattern' => '/\S/',
@@ -281,7 +276,6 @@ class NotesController extends AbstractController
 
         return null;
     }
-
     // Update a note
     #[Route('/note/{id}/update', methods: ['PUT'])]
     public function updateNote(int $id, Request $request): JsonResponse
@@ -351,7 +345,6 @@ class NotesController extends AbstractController
             );
         }
     }
-
     // Delete a note
     #[Route('/note/{id}/delete', methods: ['DELETE'])]
     public function deleteNoteById(int $id): JsonResponse
@@ -391,9 +384,7 @@ class NotesController extends AbstractController
             );
         }
     }
- 
     // Get all expired notes
-
     #[Route('/expiredNotes', methods: ['GET'])]
     public function expiredNotes(): JsonResponse
     {
@@ -405,7 +396,7 @@ class NotesController extends AbstractController
                 [
                     "success" => true,
                     "message" => "Notes obtained successfully",
-                    "data" => json_decode($data, true), 
+                    "data" => json_decode($data, true),
                 ],
                 Response::HTTP_OK
             );

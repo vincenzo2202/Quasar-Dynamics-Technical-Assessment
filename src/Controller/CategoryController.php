@@ -58,7 +58,6 @@ class CategoryController extends AbstractController
             );
         }
     }
-
     // Get a category by id
     #[Route('/category/{id}', methods: ['GET'])]
     public function getCategory(int $id): JsonResponse
@@ -97,7 +96,6 @@ class CategoryController extends AbstractController
             );
         }
     }
-
     // Validate the category
     private function validateCategory(array $data)
     {
@@ -113,7 +111,7 @@ class CategoryController extends AbstractController
                 new Assert\Length([
                     'min' => 3,
                     'max' => 100,
-                    'maxMessage' => 'The title cannot be longer than {{ 100 }} characters'
+                    'maxMessage' => 'The title cannot be longer than 100 characters'
                 ]),
                 new Assert\Regex([
                     'pattern' => '/\S/',
@@ -129,7 +127,7 @@ class CategoryController extends AbstractController
                 new Assert\Length([
                     'min' => 3,
                     'max' => 255,
-                    'maxMessage' => 'The note cannot be longer than {{ 255 }} characters'
+                    'maxMessage' => 'The note cannot be longer than 255 characters'
                 ]),
                 new Assert\Regex([
                     'pattern' => '/\S/',
@@ -150,7 +148,6 @@ class CategoryController extends AbstractController
 
         return null;
     }
-
     // Create a category
     #[Route('/category/create', methods: ['POST'])]
     public function createNote(Request $request): JsonResponse
@@ -159,7 +156,6 @@ class CategoryController extends AbstractController
             $data = json_decode($request->getContent(), true);
 
             $validator = $this->validateCategory($data);
-
 
             if ($validator) {
                 return new JsonResponse(
@@ -215,7 +211,6 @@ class CategoryController extends AbstractController
             );
         }
     }
-
     // Update a category
     #[Route('/category/{id}/update', methods: ['PUT'])]
     public function updateCategory(int $id, Request $request): JsonResponse
@@ -275,7 +270,6 @@ class CategoryController extends AbstractController
             );
         }
     }
-
     // Delete a category
     #[Route('/category/{id}/delete', methods: ['DELETE'])]
     public function deleteCategory(int $id): JsonResponse

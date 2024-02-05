@@ -25,7 +25,6 @@ final class Version20240203171413 extends AbstractMigration
             updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
             PRIMARY KEY(id)
                ) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
-    
     }
 
     public function down(Schema $schema): void

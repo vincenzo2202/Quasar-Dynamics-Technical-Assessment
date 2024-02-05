@@ -30,60 +30,59 @@ class CategoryNoteController extends AbstractController
         $this->manager = $manager;
     }
 
-   // Add Category to Note
-   #[Route('/categoryNote', methods: ['POST'])]
-   public function addCategoryNote(Request $request): JsonResponse
-   {
-    try {
-        $data = json_decode($request->getContent(), true);
- 
-        $category = $this->manager->getRepository(Category::class)->find($data['category']);
-        $note = $this->manager->getRepository(Notes::class)->find($data['note']);
+    // Add Category to Note
+    #[Route('/categoryNote', methods: ['POST'])]
+    public function addCategoryNote(Request $request): JsonResponse
+    {
+        try {
+            $data = json_decode($request->getContent(), true);
 
-        // check if category is already added to note
-        $categoryNote = $this->manager->getRepository(CategoryNote::class)->findOneBy([
-            'category' => $category,
-            'note' => $note,
-        ]);
-        
-        if ($categoryNote) { 
+            $category = $this->manager->getRepository(Category::class)->find($data['category']);
+            $note = $this->manager->getRepository(Notes::class)->find($data['note']);
+
+            // check if category is already added to note
+            $categoryNote = $this->manager->getRepository(CategoryNote::class)->findOneBy([
+                'category' => $category,
+                'note' => $note,
+            ]);
+
+            if ($categoryNote) {
+                return new JsonResponse(
+                    [
+                        "success" => true,
+                        "message" => "Category already added to note"
+                    ],
+                    Response::HTTP_CONFLICT
+                );
+            }
+
+            $categoryNote = new CategoryNote();
+            $categoryNote->setCategory($category);
+            $categoryNote->setNote($note);
+
+            $this->manager->persist($categoryNote);
+            $this->manager->flush();
+
             return new JsonResponse(
                 [
                     "success" => true,
-                    "message" => "Category already added to note"
+                    "message" => "Category added to note",
+                    "data" => $data
                 ],
-                Response::HTTP_CONFLICT
+                Response::HTTP_CREATED
+            );
+        } catch (\Throwable $th) {
+            $this->logger->error($th->getMessage());
+
+            return new JsonResponse(
+                [
+                    "success" => false,
+                    "message" => "Error adding category to note"
+                ],
+                Response::HTTP_INTERNAL_SERVER_ERROR
             );
         }
-
-        $categoryNote = new CategoryNote();
-        $categoryNote->setCategory($category);
-        $categoryNote->setNote($note); 
-
-        $this->manager->persist($categoryNote);
-        $this->manager->flush();
-
-        return new JsonResponse(
-            [
-                "success" => true,
-                "message" => "Category added to note",
-                "data"=> $data
-            ],
-            Response::HTTP_CREATED
-        );
-    } catch (\Throwable $th) {
-        $this->logger->error($th->getMessage());
-
-        return new JsonResponse(
-            [
-                "success" => false,
-                "message" => "Error adding category to note"
-            ],
-            Response::HTTP_INTERNAL_SERVER_ERROR
-        );
     }
-   }
-
     // Remove Category from Note
     #[Route('/categoryNote/{id}', methods: ['DELETE'])]
     public function removeCategoryNote(int $id): JsonResponse
@@ -108,7 +107,7 @@ class CategoryNoteController extends AbstractController
                 [
                     "success" => true,
                     "message" => "Category removed from note",
-                    "data"=> [
+                    "data" => [
                         "id" => $id,
                         "category" => $data->getCategory()->getCategory(),
                         "note" => $data->getNote()->getId()
