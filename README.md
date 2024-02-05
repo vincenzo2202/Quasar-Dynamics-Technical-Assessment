@@ -16,8 +16,11 @@
 Developed as part of the Quasar Dynamics Technical Assessment.
 
 
+<div style="text-align: center;">
+    <img src="./assets/trello2.png" style="width: 1000;" />
+</div>
  
-<br>
+ 
 
 ## Project content 
 
@@ -82,7 +85,6 @@ Notes have a ManyToMany relationship with Category since a note can have many ca
  
 <div><a href="https://www.postman.com/telecoms-meteorologist-95304418/workspace/api-notes/collection/30593296-9a0053be-6e0c-40e3-b360-6058c8b2c5d9?action=share&creator=30593296 ">POSTMAN</a></div>
 <div><a href="https://www.postman.com/telecoms-meteorologist-95304418/workspace/api-notes/collection/30593296-9a0053be-6e0c-40e3-b360-6058c8b2c5d9?action=share&creator=30593296 ">https://www.postman.com/telecoms-meteorologist-95304418/workspace/api-notes/collection/30593296-9a0053be-6e0c-40e3-b360-6058c8b2c5d9?action=share&creator=30593296 </a></div>
- 
  
   
 ## Contributions
