@@ -170,7 +170,21 @@ class UserController extends AbstractController
             $newUser->setUpdatedAt(new \DateTime());
 
             $manager->persist($newUser);
-            $manager->flush();
+            try {
+                $manager->flush();
+            } catch (\Exception $e) {
+                 return new JsonResponse(
+                    [
+                        "success" => true,
+                        "message" => "Error registering user". $e->getMessage() 
+                    ],
+                    Response::HTTP_BAD_REQUEST);
+            }
+
+            $subject = StaticUtilities::$WELCOME_BRAIN_MAIL_SUBJECT;
+            $body = StaticUtilities::getWelcomeBrainBody(StaticUtilities::$DEV_URL, date("Y"));
+            // TODO: cambiar email de envío
+            StaticUtilities::sendEmail($newUser->getEmail(), $subject, $body);
 
             return new JsonResponse(
                 [
