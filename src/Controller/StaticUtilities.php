@@ -49,7 +49,7 @@ class StaticUtilities
  
     public static $WELCOME_MAIL_SUBJECT = "¡Le damos la bienvenida!";
    
-    public static $WELCOME_BRAIN_MAIL_SUBJECT = "Bienvenido al cerebro de fennech";
+    public static $WELCOME_BRAIN_MAIL_SUBJECT = "Bienvenido al cerebro de API-Notes";
 
 
     /***************************************/
